@@ -63,17 +63,17 @@ class FilaFronteira(PilhaFronteira):
 
 
 class AStarFronteira(PilhaFronteira):
-    def __init__(self, inicio, objetivo):
+    def __init__(self, inicio, objetivo, w=1):
         super().__init__()
         self.inicio = inicio
         self.objetivo = objetivo
+        self.w = w
 
     def heuristic(self, estado):
         return cityblock(estado, self.objetivo)
 
     def function_avaliation(self, no):
-        print(f'g(n)= {no.custo} + h(n)= {self.heuristic(no.estado)} = f(n)= {self.heuristic(no.estado) + no.custo}')
-        return no.custo + self.heuristic(no.estado)
+        return no.custo + self.w * self.heuristic(no.estado)
 
     def remove(self):
         if self.empty():
@@ -179,7 +179,7 @@ class Labirinto():
         # No(estado=self.objetivo, pai=None, acao=None)
         objetivo = self.objetivo
         fronteira = AStarFronteira(
-            inicio, objetivo)  # Pilha -> Profundidade
+            inicio, objetivo,w=1)  # Pilha -> Profundidade
         fronteira.add(inicio)
 
         # Inicializa um conjunto vazio de estados não explorados
