@@ -4,31 +4,25 @@
 
 import sys
 import time
-from scipy.spatial.distance import cityblock
 
 # Classe No com 3 atributos: estado, pai e ação
-
-
 class No():
-    def __init__(self, estado, pai, acao, custo):
+    def __init__(self, estado, pai, acao):
         self.estado = estado
         self.pai = pai
         self.acao = acao
-        self.custo = custo
 
 # Classe para tratar Nós Fronteira
 # Deep First Search (DFS)
-
-
 class PilhaFronteira():
     # Inicializa Fronteira vazia
     def __init__(self):
         self.fronteira = []
-
-    # Insere na pilha
+    
+    # Insere na pilha	
     def add(self, no):
         self.fronteira.append(no)
-
+    
     # Procura no pilha por um estado
     def contem_estado(self, estado):
         return any(no.estado == estado for no in self.fronteira)
@@ -48,8 +42,6 @@ class PilhaFronteira():
 
 # Breadth First Search (BFS) herdando métodos da DFS
 # Só muda a remoção do nó da fronteira
-
-
 class FilaFronteira(PilhaFronteira):
 
     # Remove estado da Fronteira do tipo Fila
@@ -61,32 +53,7 @@ class FilaFronteira(PilhaFronteira):
             self.fronteira = self.fronteira[1:]
             return no
 
-
-class AStarFronteira(PilhaFronteira):
-    def __init__(self, inicio, objetivo, w=1):
-        super().__init__()
-        self.inicio = inicio
-        self.objetivo = objetivo
-        self.w = w
-
-    def heuristic(self, estado):
-        return cityblock(estado, self.objetivo)
-
-    def function_avaliation(self, no):
-        return no.custo + self.w * self.heuristic(no.estado)
-
-    def remove(self):
-        if self.empty():
-            raise Exception("fronteira vazia")
-        else:
-            no = min(self.fronteira, key=self.function_avaliation)
-            self.fronteira.remove(no)
-            return no
-
-
 # Classe do Problema de Busca
-
-
 class Labirinto():
 
     # Inicializa instância do problema com o arquivo TXT filename
@@ -98,8 +65,7 @@ class Labirinto():
 
         # Valida Largada e Chegada
         if contents.count("A") != 1:
-            raise Exception(
-                "labirinto deve ter exatamente um ponto de partida")
+            raise Exception("labirinto deve ter exatamente um ponto de partida")
         if contents.count("B") != 1:
             raise Exception("labirinto deve ter exatamente uma chegada")
 
@@ -149,8 +115,8 @@ class Labirinto():
             print()
         print()
 
-    # Identifica os vizinhos do estado
 
+    # Identifica os vizinhos do estado 
     def vizinhos(self, estado):
         linha, coluna = estado
         candidatos = [
@@ -166,8 +132,8 @@ class Labirinto():
                 resultado.append((acao, (l, c)))
         return resultado
 
-    # Invoca o método solve() para encontrar a solução
 
+    # Invoca o método solve() para encontrar a solução 
     def solve(self):
         """Encontrar uma solução para labirinto, se existe."""
 
@@ -175,11 +141,8 @@ class Labirinto():
         self.num_explored = 0
 
         # Inicializa a fronteira apenas para o posição inicial
-        inicio = No(estado=self.inicio, pai=None, acao=None, custo=0)
-        # No(estado=self.objetivo, pai=None, acao=None)
-        objetivo = self.objetivo
-        fronteira = AStarFronteira(
-            inicio, objetivo,w=1)  # Pilha -> Profundidade
+        inicio = No(estado=self.inicio, pai=None, acao=None)
+        fronteira = PilhaFronteira() #Pilha -> Profundidade
         fronteira.add(inicio)
 
         # Inicializa um conjunto vazio de estados não explorados
@@ -215,7 +178,7 @@ class Labirinto():
             # Adiciona vizinhos a fronteira
             for acao, estado in self.vizinhos(no.estado):
                 if not fronteira.contem_estado(estado) and estado not in self.explored:
-                    filho = No(estado=estado, pai=no, acao=acao, custo=no.custo+1)
+                    filho = No(estado=estado, pai=no, acao=acao)
                     fronteira.add(filho)
 
     # Imprime o labirinto com os estados explorados
@@ -271,7 +234,7 @@ class Labirinto():
 
 
 # ----------------------
-# Programa Principal
+# Programa Principal 
 # ----------------------
 
 if len(sys.argv) != 2:
@@ -285,11 +248,10 @@ print("Solucionando...")
 t1 = time.time()
 m.solve()
 t2 = time.time()
-tempo_execucao = t2 - t1
+tempo_execucao = t2 - t1 
 print("Tempo de Execução: ", tempo_execucao)
 
 print("Estados Explorados:", m.num_explored)
 print("Solução: ")
-
 m.print()
 m.output_image("labirinto.png", show_explored=True)
