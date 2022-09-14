@@ -253,7 +253,5 @@ print("Tempo de Execução: ", tempo_execucao)
 
 print("Estados Explorados:", m.num_explored)
 print("Solução: ")
-
-
-     m.print()
+m.print()
 m.output_image("labirinto.png", show_explored=True)
